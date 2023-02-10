@@ -1,0 +1,22 @@
+[package]
+edition = "2021"
+name = "nacos-sdk-rust-binding-node"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
+napi = { version = "2", default-features = false, features = ["napi4"] }
+napi-derive = "2"
+
+nacos-sdk = "^0.2"
+tracing-subscriber = "0.3"
+tracing-appender = "0.2"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
