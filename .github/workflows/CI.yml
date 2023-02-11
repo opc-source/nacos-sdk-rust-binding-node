@@ -177,6 +177,8 @@ jobs:
             curl https://sh.rustup.rs -sSf --output rustup.sh
             sh rustup.sh -y --profile minimal --default-toolchain beta
             export PATH="/usr/local/cargo/bin:$PATH"
+            echo "~~~~ rustup default 1.66.0 ~~~~"
+            rustup default 1.66.0
             echo "~~~~ rustc --version ~~~~"
             rustc --version
             echo "~~~~ node -v ~~~~"

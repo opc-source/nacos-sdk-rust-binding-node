@@ -16,6 +16,7 @@ pub fn sum(a: i32, b: i32) -> i32 {
 
 static INIT_ONCE: std::sync::Once = std::sync::Once::new();
 
+/// Client api of Nacos Config.
 #[napi]
 pub struct NacosConfigClient {
   inner: Box<dyn nacos_sdk::api::config::ConfigService>,
@@ -84,18 +85,16 @@ impl NacosConfigClient {
     }
   }
 
+  /// Get a NacosConfigResponse from server.
   #[napi]
-  pub fn get_config(&mut self, data_id: String, group: String) -> Result<String> {
-    let config_resp = self.inner.get_config(data_id, group);
+  pub fn get_config(&mut self, data_id: String, group: String) -> Result<NacosConfigResponse> {
+    let config_resp = self.inner.get_config(data_id, group)
+        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
-    Ok(
-      config_resp
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?
-        .content()
-        .to_string(),
-    )
+    Ok(transfer_conf_resp(config_resp))
   }
 
+  /// Add a NacosConfigChangeListener callback func, which listen the config change.
   #[napi]
   pub fn add_listener(
     &mut self,
@@ -137,18 +136,22 @@ pub struct NacosConfigChangeListener {
   func: Arc<ThreadsafeFunction<NacosConfigResponse>>,
 }
 
+fn transfer_conf_resp(config_resp: nacos_sdk::api::config::ConfigResponse) -> NacosConfigResponse {
+  NacosConfigResponse {
+    namespace: config_resp.namespace().to_string(),
+    data_id: config_resp.data_id().to_string().to_string(),
+    group: config_resp.group().to_string(),
+    content: config_resp.content().to_string(),
+    content_type: config_resp.content_type().to_string(),
+    md5: config_resp.md5().to_string(),
+  }
+}
+
 impl nacos_sdk::api::config::ConfigChangeListener for NacosConfigChangeListener {
   fn notify(&self, config_resp: nacos_sdk::api::config::ConfigResponse) {
     let listen = self.func.clone();
 
-    let conf_resp = NacosConfigResponse {
-      namespace: config_resp.namespace().to_string(),
-      data_id: config_resp.data_id().to_string().to_string(),
-      group: config_resp.group().to_string(),
-      content: config_resp.content().to_string(),
-      content_type: config_resp.content_type().to_string(),
-      md5: config_resp.md5().to_string(),
-    };
+    let conf_resp = transfer_conf_resp(config_resp);
 
     std::thread::spawn(move || {
       listen.call(Ok(conf_resp), ThreadsafeFunctionCallMode::NonBlocking);

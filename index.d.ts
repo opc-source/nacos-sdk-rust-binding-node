@@ -18,8 +18,11 @@ export interface NacosConfigResponse {
   /** Content's md5 */
   md5: string
 }
+/** Client api of Nacos Config. */
 export class NacosConfigClient {
   constructor(serverAddr: string, namespace: string, appName: string, username?: string | undefined | null, password?: string | undefined | null)
-  getConfig(dataId: string, group: string): string
+  /** Get a NacosConfigResponse from server. */
+  getConfig(dataId: string, group: string): NacosConfigResponse
+  /** Add a NacosConfigChangeListener callback func, which listen the config change. */
   addListener(dataId: string, group: string, listener: (err: Error | null, value: NacosConfigResponse) => any): void
 }
