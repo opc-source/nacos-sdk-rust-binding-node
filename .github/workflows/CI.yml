@@ -42,12 +42,12 @@ jobs:
             build: |-
               set -e &&
               apt-get update && apt-get install -y openssl libssl-dev &&
-              RUST_BACKTRACE=1 yarn build --target x86_64-unknown-linux-gnu &&
+              RUST_BACKTRACE=full yarn build --target x86_64-unknown-linux-gnu &&
               strip *.node
-#          - host: ubuntu-latest
-#            target: x86_64-unknown-linux-musl
-#            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-#            build: set -e && apt-get install -y openssl libssl-dev && yarn build && strip *.node
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+            build: set -e && apk add openssl-dev && yarn build && strip *.node
           - host: macos-latest
             target: aarch64-apple-darwin
             build: |
@@ -79,15 +79,15 @@ jobs:
 #            build: |
 #              yarn build --target armv7-linux-androideabi
 #              ${ANDROID_NDK_LATEST_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip *.node
-#          - host: ubuntu-latest
-#            target: aarch64-unknown-linux-musl
-#            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-#            build: |-
-#              set -e &&
-#              apt-get install -y openssl libssl-dev &&
-#              rustup target add aarch64-unknown-linux-musl &&
-#              yarn build --target aarch64-unknown-linux-musl &&
-#              /aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip *.node
+          - host: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
+            build: |-
+              set -e &&
+              apk add openssl-dev &&
+              rustup target add aarch64-unknown-linux-musl &&
+              yarn build --target aarch64-unknown-linux-musl &&
+              /aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip *.node
 #          - host: windows-latest
 #            target: aarch64-pc-windows-msvc
 #            build: yarn build --target aarch64-pc-windows-msvc
