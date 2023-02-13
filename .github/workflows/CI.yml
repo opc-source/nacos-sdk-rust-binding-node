@@ -42,7 +42,7 @@ jobs:
             build: |-
               set -e &&
               apt-get update && apt-get install -y openssl libssl-dev &&
-              yarn build --target x86_64-unknown-linux-gnu &&
+              RUST_BACKTRACE=1 yarn build --target x86_64-unknown-linux-gnu &&
               strip *.node
 #          - host: ubuntu-latest
 #            target: x86_64-unknown-linux-musl
@@ -59,7 +59,7 @@ jobs:
             build: |-
               set -e &&
               apt-get update && apt-get install -y openssl libssl-dev &&
-              yarn build --target aarch64-unknown-linux-gnu &&
+              RUST_BACKTRACE=1 yarn build --target aarch64-unknown-linux-gnu &&
               aarch64-unknown-linux-gnu-strip *.node
           - host: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
@@ -67,7 +67,7 @@ jobs:
               sudo apt-get update
               sudo apt-get install openssl libssl-dev gcc-arm-linux-gnueabihf -y
             build: |
-              yarn build --target armv7-unknown-linux-gnueabihf
+              RUST_BACKTRACE=1 yarn build --target armv7-unknown-linux-gnueabihf
               arm-linux-gnueabihf-strip *.node
 #          - host: ubuntu-latest
 #            target: aarch64-linux-android
