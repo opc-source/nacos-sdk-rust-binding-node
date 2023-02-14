@@ -1,6 +1,6 @@
 {
   "name": "nacos-sdk-rust-binding-node",
-  "version": "0.0.1",
+  "version": "0.0.1-ALPHA",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
