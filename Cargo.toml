@@ -2,6 +2,13 @@
 edition = "2021"
 name = "nacos-sdk-rust-binding-node"
 version = "0.0.1"
+authors = ["CheirshCai <785427346@qq.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/opc-source/nacos-sdk-rust-binding-node"
+description = "nacos-sdk-rust binding for NodeJs with napi."
+categories = ["network-programming", "development-tools"]
+keywords = ["nacos", "ffi", "napi", "bingding", "nodejs"]
 
 [lib]
 crate-type = ["cdylib"]
@@ -12,7 +19,7 @@ napi = { version = "2", default-features = false, features = ["napi4"] }
 napi-derive = "2"
 
 # version = ^0.2
-nacos-sdk = { git = "https://github.com/CherishCai/nacos-sdk-rust.git", branch = "chore_try_grpcio-sys_exlude_openssl"}
+nacos-sdk = { git = "https://github.com/nacos-group/nacos-sdk-rust.git"}
 tracing-subscriber = "0.3"
 tracing-appender = "0.2"
 
