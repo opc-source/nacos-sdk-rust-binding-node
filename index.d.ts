@@ -33,14 +33,14 @@ export interface NacosConfigResponse {
 /** Client api of Nacos Config. */
 export class NacosConfigClient {
   constructor(clientOptions: ClientOptions)
-  /** Get config content from server. */
+  /** Get config's content. */
   getConfig(dataId: string, group: string): string
-  /** Get a NacosConfigResponse from server. */
+  /** Get NacosConfigResponse. */
   getConfigResp(dataId: string, group: string): NacosConfigResponse
   /** Publish config. */
   publishConfig(dataId: string, group: string, content: string): boolean
   /** Remove config. */
   removeConfig(dataId: string, group: string): boolean
-  /** Add a NacosConfigChangeListener callback func, which listen the config change. */
+  /** Add NacosConfigChangeListener callback func, which listen the config change. */
   addListener(dataId: string, group: string, listener: (err: Error | null, value: NacosConfigResponse) => any): void
 }

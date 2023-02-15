@@ -36,18 +36,17 @@ jobs:
 #              yarn build --target i686-pc-windows-msvc
 #              yarn test
 #            target: i686-pc-windows-msvc
-#          - host: ubuntu-latest
-#            target: x86_64-unknown-linux-gnu
-#            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
-#            build: |-
-#              set -e &&
-#              apt-get update && apt-get install -y openssl libssl-dev &&
-#              RUST_BACKTRACE=full yarn build --target x86_64-unknown-linux-gnu &&
-#              strip *.node
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
+            build: |-
+              set -e &&
+              RUST_BACKTRACE=full yarn build --target x86_64-unknown-linux-gnu &&
+              strip *.node
 #          - host: ubuntu-latest
 #            target: x86_64-unknown-linux-musl
 #            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-#            build: set -e && apk add openssl-dev && yarn build && strip *.node
+#            build: set -e && yarn build && strip *.node
           - host: macos-latest
             target: aarch64-apple-darwin
             build: |
@@ -58,14 +57,13 @@ jobs:
 #            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
 #            build: |-
 #              set -e &&
-#              apt-get update && apt-get install -y openssl libssl-dev &&
 #              RUST_BACKTRACE=1 yarn build --target aarch64-unknown-linux-gnu &&
 #              aarch64-unknown-linux-gnu-strip *.node
 #          - host: ubuntu-latest
 #            target: armv7-unknown-linux-gnueabihf
 #            setup: |
 #              sudo apt-get update
-#              sudo apt-get install openssl libssl-dev gcc-arm-linux-gnueabihf -y
+#              sudo apt-get install gcc-arm-linux-gnueabihf -y
 #            build: |
 #              RUST_BACKTRACE=1 yarn build --target armv7-unknown-linux-gnueabihf
 #              arm-linux-gnueabihf-strip *.node
@@ -84,7 +82,6 @@ jobs:
 #            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
 #            build: |-
 #              set -e &&
-#              apk add openssl-dev &&
 #              rustup target add aarch64-unknown-linux-musl &&
 #              yarn build --target aarch64-unknown-linux-musl &&
 #              /aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip *.node
@@ -175,7 +172,7 @@ jobs:
 #          usesh: true
 #          mem: 3000
 #          prepare: |
-#            pkg install -y -f curl node libnghttp2 openssl
+#            pkg install -y -f curl node libnghttp2
 #            curl -qL https://www.npmjs.com/install.sh | sh
 #            npm install --location=global --ignore-scripts yarn
 #            curl https://sh.rustup.rs -sSf --output rustup.sh
