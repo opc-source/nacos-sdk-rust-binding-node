@@ -19,7 +19,7 @@ napi = { version = "2", default-features = false, features = ["napi4"] }
 napi-derive = "2"
 
 # version = ^0.2
-nacos-sdk = { git = "https://github.com/nacos-group/nacos-sdk-rust.git"}
+nacos-sdk = { git = "https://github.com/CherishCai/nacos-sdk-rust.git", branch = "chore_try_exlude_tls_openssl" }
 tracing-subscriber = "0.3"
 tracing-appender = "0.2"
 
