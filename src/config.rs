@@ -58,12 +58,14 @@ impl NacosConfigClient {
   }
 
   /// Get config's content.
+  /// If it fails, pay attention to err
   #[napi]
   pub fn get_config(&mut self, data_id: String, group: String) -> Result<String> {
     Ok(self.get_config_resp(data_id, group)?.content)
   }
 
   /// Get NacosConfigResponse.
+  /// If it fails, pay attention to err
   #[napi]
   pub fn get_config_resp(&mut self, data_id: String, group: String) -> Result<NacosConfigResponse> {
     let config_resp = self
@@ -75,6 +77,7 @@ impl NacosConfigClient {
   }
 
   /// Publish config.
+  /// If it fails, pay attention to err
   #[napi]
   pub fn publish_config(
     &mut self,
@@ -91,6 +94,7 @@ impl NacosConfigClient {
   }
 
   /// Remove config.
+  /// If it fails, pay attention to err
   #[napi]
   pub fn remove_config(&mut self, data_id: String, group: String) -> Result<bool> {
     Ok(
@@ -102,6 +106,7 @@ impl NacosConfigClient {
   }
 
   /// Add NacosConfigChangeListener callback func, which listen the config change.
+  /// If it fails, pay attention to err
   #[napi]
   pub fn add_listener(
     &mut self,

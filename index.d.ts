@@ -30,17 +30,93 @@ export interface NacosConfigResponse {
   /** Content's md5 */
   md5: string
 }
+export interface NacosServiceInstance {
+  /** Instance Id */
+  instanceId?: string
+  /** Ip */
+  ip: string
+  /** Port */
+  port: number
+  /** Weight */
+  weight: number
+  /** Healthy or not */
+  healthy: boolean
+  /** Enabled ot not */
+  enabled: boolean
+  /** Ephemeral or not */
+  ephemeral: boolean
+  /** Cluster Name */
+  clusterName?: string
+  /** Service Name */
+  serviceName?: string
+  /** Metadata */
+  metadata: Record<string, string>
+}
 /** Client api of Nacos Config. */
 export class NacosConfigClient {
   constructor(clientOptions: ClientOptions)
-  /** Get config's content. */
+  /**
+   * Get config's content.
+   * If it fails, pay attention to err
+   */
   getConfig(dataId: string, group: string): string
-  /** Get NacosConfigResponse. */
+  /**
+   * Get NacosConfigResponse.
+   * If it fails, pay attention to err
+   */
   getConfigResp(dataId: string, group: string): NacosConfigResponse
-  /** Publish config. */
+  /**
+   * Publish config.
+   * If it fails, pay attention to err
+   */
   publishConfig(dataId: string, group: string, content: string): boolean
-  /** Remove config. */
+  /**
+   * Remove config.
+   * If it fails, pay attention to err
+   */
   removeConfig(dataId: string, group: string): boolean
-  /** Add NacosConfigChangeListener callback func, which listen the config change. */
+  /**
+   * Add NacosConfigChangeListener callback func, which listen the config change.
+   * If it fails, pay attention to err
+   */
   addListener(dataId: string, group: string, listener: (err: Error | null, value: NacosConfigResponse) => any): void
+}
+/** Client api of Nacos Naming. */
+export class NacosNamingClient {
+  constructor(clientOptions: ClientOptions)
+  /**
+   * Register instance.
+   * If it fails, pay attention to err
+   */
+  registerService(serviceName: string, group: string, serviceInstance: NacosServiceInstance): void
+  /**
+   * Deregister instance.
+   * If it fails, pay attention to err
+   */
+  deregisterInstance(serviceName: string, group: string, serviceInstance: NacosServiceInstance): void
+  /**
+   * Batch register instance, improve interaction efficiency.
+   * If it fails, pay attention to err
+   */
+  batchRegisterInstance(serviceName: string, group: string, serviceInstances: Array<NacosServiceInstance>): void
+  /**
+   * Get all instances by service and group.
+   * If it fails, pay attention to err
+   */
+  getAllInstances(serviceName: string, group: string, clusters: Array<string>, subscribe: boolean): Array<NacosServiceInstance>
+  /**
+   * Select instances whether healthy or not.
+   * If it fails, pay attention to err
+   */
+  selectInstance(serviceName: string, group: string, clusters: Array<string>, subscribe: boolean, healthy: boolean): Array<NacosServiceInstance>
+  /**
+   * Select one healthy instance.
+   * If it fails, pay attention to err
+   */
+  selectOneHealthyInstance(serviceName: string, group: string, clusters: Array<string>, subscribe: boolean): NacosServiceInstance
+  /**
+   * Add NacosNamingEventListener callback func, which listen the instance change.
+   * If it fails, pay attention to err
+   */
+  subscribe(serviceName: string, group: string, clusters: Array<string>, listener: (err: Error | null, value: Array<NacosServiceInstance>) => any): void
 }
