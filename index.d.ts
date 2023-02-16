@@ -88,7 +88,7 @@ export class NacosNamingClient {
    * Register instance.
    * If it fails, pay attention to err
    */
-  registerService(serviceName: string, group: string, serviceInstance: NacosServiceInstance): void
+  registerInstance(serviceName: string, group: string, serviceInstance: NacosServiceInstance): void
   /**
    * Deregister instance.
    * If it fails, pay attention to err
@@ -108,7 +108,7 @@ export class NacosNamingClient {
    * Select instances whether healthy or not.
    * If it fails, pay attention to err
    */
-  selectInstance(serviceName: string, group: string, clusters: Array<string>, subscribe: boolean, healthy: boolean): Array<NacosServiceInstance>
+  selectInstances(serviceName: string, group: string, clusters: Array<string>, subscribe: boolean, healthy: boolean): Array<NacosServiceInstance>
   /**
    * Select one healthy instance.
    * If it fails, pay attention to err

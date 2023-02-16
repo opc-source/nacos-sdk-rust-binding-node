@@ -60,7 +60,7 @@ impl NacosNamingClient {
   /// Register instance.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn register_service(
+  pub fn register_instance(
     &self,
     service_name: String,
     group: String,
@@ -147,7 +147,7 @@ impl NacosNamingClient {
   /// Select instances whether healthy or not.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn select_instance(
+  pub fn select_instances(
     &self,
     service_name: String,
     group: String,
