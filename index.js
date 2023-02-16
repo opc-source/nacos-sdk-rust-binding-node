@@ -246,7 +246,8 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { sum, NacosConfigClient } = nativeBinding
+const { sum, NacosConfigClient, NacosNamingClient } = nativeBinding
 
 module.exports.sum = sum
 module.exports.NacosConfigClient = NacosConfigClient
+module.exports.NacosNamingClient = NacosNamingClient
