@@ -11,50 +11,45 @@ pub struct NacosNamingClient {
 
 #[napi]
 impl NacosNamingClient {
+  /// Build a Naming Client.
   #[napi(constructor)]
   pub fn new(client_options: crate::ClientOptions) -> Result<NacosNamingClient> {
     // print to console or file
     crate::log_print_to_console_or_file();
 
-    // enable_auth_plugin_http with username & password
-    if client_options.username.is_some() && client_options.password.is_some() {
-      let props = nacos_sdk::api::props::ClientProps::new()
-        .server_addr(client_options.server_addr)
-        .namespace(client_options.namespace)
-        .app_name(
-          client_options
-            .app_name
-            .unwrap_or(nacos_sdk::api::constants::UNKNOWN.to_string()),
-        )
+    let props = nacos_sdk::api::props::ClientProps::new()
+      .server_addr(client_options.server_addr)
+      .namespace(client_options.namespace)
+      .app_name(
+        client_options
+          .app_name
+          .unwrap_or(nacos_sdk::api::constants::UNKNOWN.to_string()),
+      );
+
+    // need enable_auth_plugin_http with username & password
+    let is_enable_auth = client_options.username.is_some() && client_options.password.is_some();
+
+    let props = if is_enable_auth {
+      props
         .auth_username(client_options.username.unwrap())
-        .auth_password(client_options.password.unwrap());
-
-      let config_service = nacos_sdk::api::naming::NamingServiceBuilder::new(props)
-        .enable_auth_plugin_http()
-        .build()
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
-
-      Ok(NacosNamingClient {
-        inner: Box::new(config_service),
-      })
+        .auth_password(client_options.password.unwrap())
     } else {
-      let props = nacos_sdk::api::props::ClientProps::new()
-        .server_addr(client_options.server_addr)
-        .namespace(client_options.namespace)
-        .app_name(
-          client_options
-            .app_name
-            .unwrap_or(nacos_sdk::api::constants::UNKNOWN.to_string()),
-        );
+      props
+    };
 
-      let config_service = nacos_sdk::api::naming::NamingServiceBuilder::new(props)
-        .build()
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+    let naming_service_builder = if is_enable_auth {
+      nacos_sdk::api::naming::NamingServiceBuilder::new(props).enable_auth_plugin_http()
+    } else {
+      nacos_sdk::api::naming::NamingServiceBuilder::new(props)
+    };
 
-      Ok(NacosNamingClient {
-        inner: Box::new(config_service),
-      })
-    }
+    let naming_service = naming_service_builder
+      .build()
+      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+
+    Ok(NacosNamingClient {
+      inner: Box::new(naming_service),
+    })
   }
 
   /// Register instance.
@@ -66,16 +61,14 @@ impl NacosNamingClient {
     group: String,
     service_instance: NacosServiceInstance,
   ) -> Result<()> {
-    Ok(
-      self
-        .inner
-        .register_service(
-          service_name,
-          Some(group),
-          transfer_js_instance_to_rust(&service_instance),
-        )
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?,
-    )
+    self
+      .inner
+      .register_service(
+        service_name,
+        Some(group),
+        transfer_js_instance_to_rust(&service_instance),
+      )
+      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
   /// Deregister instance.
@@ -87,16 +80,14 @@ impl NacosNamingClient {
     group: String,
     service_instance: NacosServiceInstance,
   ) -> Result<()> {
-    Ok(
-      self
-        .inner
-        .deregister_instance(
-          service_name,
-          Some(group),
-          transfer_js_instance_to_rust(&service_instance),
-        )
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?,
-    )
+    self
+      .inner
+      .deregister_instance(
+        service_name,
+        Some(group),
+        transfer_js_instance_to_rust(&service_instance),
+      )
+      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
   /// Batch register instance, improve interaction efficiency.
@@ -110,77 +101,95 @@ impl NacosNamingClient {
   ) -> Result<()> {
     let rust_instances = service_instances
       .iter()
-      .map(|ins| transfer_js_instance_to_rust(ins))
+      .map(transfer_js_instance_to_rust)
       .collect();
 
-    Ok(
-      self
-        .inner
-        .batch_register_instance(service_name, Some(group), rust_instances)
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?,
-    )
+    self
+      .inner
+      .batch_register_instance(service_name, Some(group), rust_instances)
+      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
-  /// Get all instances by service and group.
+  /// Get all instances by service and group. default cluster=[], subscribe=true.
   /// If it fails, pay attention to err
   #[napi]
   pub fn get_all_instances(
     &self,
     service_name: String,
     group: String,
-    clusters: Vec<String>,
-    subscribe: bool,
+    clusters: Option<Vec<String>>,
+    #[napi(ts_arg_type = "boolean = true")]
+    subscribe: Option<bool>,
   ) -> Result<Vec<NacosServiceInstance>> {
     let rust_instances = self
       .inner
-      .get_all_instances(service_name, Some(group), clusters, subscribe)
+      .get_all_instances(
+        service_name,
+        Some(group),
+        clusters.unwrap_or_default(),
+        subscribe.unwrap_or(true),
+      )
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(
       rust_instances
         .iter()
-        .map(|ins| transfer_rust_instance_to_js(ins))
+        .map(transfer_rust_instance_to_js)
         .collect(),
     )
   }
 
-  /// Select instances whether healthy or not.
+  /// Select instances whether healthy or not. default cluster=[], subscribe=true, healthy=true.
   /// If it fails, pay attention to err
   #[napi]
   pub fn select_instances(
     &self,
     service_name: String,
     group: String,
-    clusters: Vec<String>,
-    subscribe: bool,
-    healthy: bool,
+    clusters: Option<Vec<String>>,
+    #[napi(ts_arg_type = "boolean = true")]
+    subscribe: Option<bool>,
+    #[napi(ts_arg_type = "boolean = true")]
+    healthy: Option<bool>,
   ) -> Result<Vec<NacosServiceInstance>> {
     let rust_instances = self
       .inner
-      .select_instance(service_name, Some(group), clusters, subscribe, healthy)
+      .select_instance(
+        service_name,
+        Some(group),
+        clusters.unwrap_or_default(),
+        subscribe.unwrap_or(true),
+        healthy.unwrap_or(true),
+      )
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(
       rust_instances
         .iter()
-        .map(|ins| transfer_rust_instance_to_js(ins))
+        .map(transfer_rust_instance_to_js)
         .collect(),
     )
   }
 
-  /// Select one healthy instance.
+  /// Select one healthy instance. default cluster=[], subscribe=true.
   /// If it fails, pay attention to err
   #[napi]
   pub fn select_one_healthy_instance(
     &self,
     service_name: String,
     group: String,
-    clusters: Vec<String>,
-    subscribe: bool,
+    clusters: Option<Vec<String>>,
+    #[napi(ts_arg_type = "boolean = true")]
+    subscribe: Option<bool>,
   ) -> Result<NacosServiceInstance> {
     let rust_instance = self
       .inner
-      .select_one_healthy_instance(service_name, Some(group), clusters, subscribe)
+      .select_one_healthy_instance(
+        service_name,
+        Some(group),
+        clusters.unwrap_or_default(),
+        subscribe.unwrap_or(true),
+      )
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(transfer_rust_instance_to_js(&rust_instance))
@@ -193,7 +202,7 @@ impl NacosNamingClient {
     &self,
     service_name: String,
     group: String,
-    clusters: Vec<String>,
+    clusters: Option<Vec<String>>,
     listener: ThreadsafeFunction<Vec<NacosServiceInstance>>,
   ) -> Result<()> {
     self
@@ -201,7 +210,7 @@ impl NacosNamingClient {
       .subscribe(
         service_name,
         Some(group),
-        clusters,
+        clusters.unwrap_or_default(),
         Arc::new(NacosNamingEventListener {
           func: Arc::new(listener),
         }),
@@ -227,7 +236,7 @@ impl nacos_sdk::api::naming::NamingEventListener for NacosNamingEventListener {
 
     let js_instances = rust_instances
       .iter()
-      .map(|ins| transfer_rust_instance_to_js(ins))
+      .map(transfer_rust_instance_to_js)
       .collect();
 
     std::thread::spawn(move || {
