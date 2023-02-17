@@ -253,20 +253,20 @@ pub struct NacosServiceInstance {
   pub ip: String,
   /// Port
   pub port: i32,
-  /// Weight
-  pub weight: f64,
-  /// Healthy or not
-  pub healthy: bool,
-  /// Enabled ot not
-  pub enabled: bool,
-  /// Ephemeral or not
-  pub ephemeral: bool,
-  /// Cluster Name
+  /// Weight, default 1.0
+  pub weight: Option<f64>,
+  /// Healthy or not, default true
+  pub healthy: Option<bool>,
+  /// Enabled ot not, default true
+  pub enabled: Option<bool>,
+  /// Ephemeral or not, default true
+  pub ephemeral: Option<bool>,
+  /// Cluster Name, default 'DEFAULT'
   pub cluster_name: Option<String>,
   /// Service Name
   pub service_name: Option<String>,
-  /// Metadata
-  pub metadata: std::collections::HashMap<String, String>,
+  /// Metadata, default '{}'
+  pub metadata: Option<std::collections::HashMap<String, String>>,
 }
 
 fn transfer_js_instance_to_rust(
@@ -276,13 +276,13 @@ fn transfer_js_instance_to_rust(
     instance_id: js_instance.instance_id.clone(),
     ip: js_instance.ip.clone(),
     port: js_instance.port,
-    weight: js_instance.weight,
-    healthy: js_instance.healthy,
-    enabled: js_instance.enabled,
-    ephemeral: js_instance.ephemeral,
+    weight: js_instance.weight.unwrap_or(1.0),
+    healthy: js_instance.healthy.unwrap_or(true),
+    enabled: js_instance.enabled.unwrap_or(true),
+    ephemeral: js_instance.ephemeral.unwrap_or(true),
     cluster_name: js_instance.cluster_name.clone(),
     service_name: js_instance.service_name.clone(),
-    metadata: js_instance.metadata.clone(),
+    metadata: js_instance.metadata.clone().unwrap_or_default(),
   }
 }
 
@@ -293,12 +293,12 @@ fn transfer_rust_instance_to_js(
     instance_id: rust_instance.instance_id.clone(),
     ip: rust_instance.ip.clone(),
     port: rust_instance.port,
-    weight: rust_instance.weight,
-    healthy: rust_instance.healthy,
-    enabled: rust_instance.enabled,
-    ephemeral: rust_instance.ephemeral,
+    weight: Some(rust_instance.weight),
+    healthy: Some(rust_instance.healthy),
+    enabled: Some(rust_instance.enabled),
+    ephemeral: Some(rust_instance.ephemeral),
     cluster_name: rust_instance.cluster_name.clone(),
     service_name: rust_instance.service_name.clone(),
-    metadata: rust_instance.metadata.clone(),
+    metadata: Some(rust_instance.metadata.clone()),
   }
 }

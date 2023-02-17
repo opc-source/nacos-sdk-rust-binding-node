@@ -37,20 +37,20 @@ export interface NacosServiceInstance {
   ip: string
   /** Port */
   port: number
-  /** Weight */
-  weight: number
-  /** Healthy or not */
-  healthy: boolean
-  /** Enabled ot not */
-  enabled: boolean
-  /** Ephemeral or not */
-  ephemeral: boolean
-  /** Cluster Name */
+  /** Weight, default 1.0 */
+  weight?: number
+  /** Healthy or not, default true */
+  healthy?: boolean
+  /** Enabled ot not, default true */
+  enabled?: boolean
+  /** Ephemeral or not, default true */
+  ephemeral?: boolean
+  /** Cluster Name, default 'DEFAULT' */
   clusterName?: string
   /** Service Name */
   serviceName?: string
-  /** Metadata */
-  metadata: Record<string, string>
+  /** Metadata, default '{}' */
+  metadata?: Record<string, string>
 }
 /** Client api of Nacos Config. */
 export class NacosConfigClient {
