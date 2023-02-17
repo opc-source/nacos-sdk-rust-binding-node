@@ -11,50 +11,45 @@ pub struct NacosConfigClient {
 
 #[napi]
 impl NacosConfigClient {
+  /// Build a Config Client.
   #[napi(constructor)]
   pub fn new(client_options: crate::ClientOptions) -> Result<NacosConfigClient> {
     // print to console or file
     crate::log_print_to_console_or_file();
 
-    // enable_auth_plugin_http with username & password
-    if client_options.username.is_some() && client_options.password.is_some() {
-      let props = nacos_sdk::api::props::ClientProps::new()
-        .server_addr(client_options.server_addr)
-        .namespace(client_options.namespace)
-        .app_name(
-          client_options
-            .app_name
-            .unwrap_or(nacos_sdk::api::constants::UNKNOWN.to_string()),
-        )
+    let props = nacos_sdk::api::props::ClientProps::new()
+      .server_addr(client_options.server_addr)
+      .namespace(client_options.namespace)
+      .app_name(
+        client_options
+          .app_name
+          .unwrap_or(nacos_sdk::api::constants::UNKNOWN.to_string()),
+      );
+
+    // need enable_auth_plugin_http with username & password
+    let is_enable_auth = client_options.username.is_some() && client_options.password.is_some();
+
+    let props = if is_enable_auth {
+      props
         .auth_username(client_options.username.unwrap())
-        .auth_password(client_options.password.unwrap());
-
-      let config_service = nacos_sdk::api::config::ConfigServiceBuilder::new(props)
-        .enable_auth_plugin_http()
-        .build()
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
-
-      Ok(NacosConfigClient {
-        inner: Box::new(config_service),
-      })
+        .auth_password(client_options.password.unwrap())
     } else {
-      let props = nacos_sdk::api::props::ClientProps::new()
-        .server_addr(client_options.server_addr)
-        .namespace(client_options.namespace)
-        .app_name(
-          client_options
-            .app_name
-            .unwrap_or(nacos_sdk::api::constants::UNKNOWN.to_string()),
-        );
+      props
+    };
 
-      let config_service = nacos_sdk::api::config::ConfigServiceBuilder::new(props)
-        .build()
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+    let config_service_builder = if is_enable_auth {
+      nacos_sdk::api::config::ConfigServiceBuilder::new(props).enable_auth_plugin_http()
+    } else {
+      nacos_sdk::api::config::ConfigServiceBuilder::new(props)
+    };
 
-      Ok(NacosConfigClient {
-        inner: Box::new(config_service),
-      })
-    }
+    let config_service = config_service_builder
+      .build()
+      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+
+    Ok(NacosConfigClient {
+      inner: Box::new(config_service),
+    })
   }
 
   /// Get config's content.
@@ -85,24 +80,20 @@ impl NacosConfigClient {
     group: String,
     content: String,
   ) -> Result<bool> {
-    Ok(
-      self
-        .inner
-        .publish_config(data_id, group, content, None)
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?,
-    )
+    self
+      .inner
+      .publish_config(data_id, group, content, None)
+      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
   /// Remove config.
   /// If it fails, pay attention to err
   #[napi]
   pub fn remove_config(&mut self, data_id: String, group: String) -> Result<bool> {
-    Ok(
-      self
-        .inner
-        .remove_config(data_id, group)
-        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?,
-    )
+    self
+      .inner
+      .remove_config(data_id, group)
+      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
   /// Add NacosConfigChangeListener callback func, which listen the config change.
@@ -163,7 +154,7 @@ impl nacos_sdk::api::config::ConfigChangeListener for NacosConfigChangeListener 
 fn transfer_conf_resp(config_resp: nacos_sdk::api::config::ConfigResponse) -> NacosConfigResponse {
   NacosConfigResponse {
     namespace: config_resp.namespace().to_string(),
-    data_id: config_resp.data_id().to_string().to_string(),
+    data_id: config_resp.data_id().to_string(),
     group: config_resp.group().to_string(),
     content: config_resp.content().to_string(),
     content_type: config_resp.content_type().to_string(),
