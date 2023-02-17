@@ -12,10 +12,6 @@ const nacos_naming_client = new NacosNamingClient({
 const instance1 = {
   ip: '127.0.0.1',
   port: 9090,
-  weight: 1.0,
-  healthy: true,
-  enabled: true,
-  ephemeral: true,
   metadata: { 'application' : 'example-naming' },
 }
 
