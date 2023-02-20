@@ -51,3 +51,6 @@ pub use config::*;
 
 mod naming;
 pub use naming::*;
+
+mod plugin;
+pub use plugin::*;

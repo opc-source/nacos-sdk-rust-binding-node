@@ -13,7 +13,15 @@ pub struct NacosConfigClient {
 impl NacosConfigClient {
   /// Build a Config Client.
   #[napi(constructor)]
-  pub fn new(client_options: crate::ClientOptions) -> Result<NacosConfigClient> {
+  pub fn new(
+    client_options: crate::ClientOptions,
+    config_filter: Option<
+      ThreadsafeFunction<(
+        Option<crate::NacosConfigReq>,
+        Option<crate::NacosConfigResp>,
+      )>,
+    >,
+  ) -> Result<NacosConfigClient> {
     // print to console or file
     crate::log_print_to_console_or_file();
 
@@ -41,6 +49,14 @@ impl NacosConfigClient {
       nacos_sdk::api::config::ConfigServiceBuilder::new(props).enable_auth_plugin_http()
     } else {
       nacos_sdk::api::config::ConfigServiceBuilder::new(props)
+    };
+
+    let config_service_builder = if config_filter.is_some() {
+      config_service_builder.add_config_filter(Box::new(crate::NacosConfigFilter {
+        func: Arc::new(config_filter.unwrap()),
+      }))
+    } else {
+      config_service_builder
     };
 
     let config_service = config_service_builder

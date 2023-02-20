@@ -52,10 +52,36 @@ export interface NacosServiceInstance {
   /** Metadata, default '{}' */
   metadata?: Record<string, string>
 }
+/** ConfigReq for [`ConfigFilter`] */
+export interface NacosConfigReq {
+  /** DataId */
+  dataId: string
+  /** Group */
+  group: string
+  /** Namespace/Tenant */
+  namespace: string
+  /** Content */
+  content: string
+  /** Content's Encrypted Data Key. */
+  encryptedDataKey: string
+}
+/** ConfigResp for [`ConfigFilter`] */
+export interface NacosConfigResp {
+  /** DataId */
+  dataId: string
+  /** Group */
+  group: string
+  /** Namespace/Tenant */
+  namespace: string
+  /** Content */
+  content: string
+  /** Content's Encrypted Data Key. */
+  encryptedDataKey: string
+}
 /** Client api of Nacos Config. */
 export class NacosConfigClient {
   /** Build a Config Client. */
-  constructor(clientOptions: ClientOptions)
+  constructor(clientOptions: ClientOptions, configFilter?: (err: Error | null, arg0?: NacosConfigReq | undefined | null, arg1?: NacosConfigResp | undefined | null) => any | undefined | null)
   /**
    * Get config's content.
    * If it fails, pay attention to err
