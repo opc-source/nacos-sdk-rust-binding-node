@@ -8,18 +8,14 @@ pub fn sum(a: i32, b: i32) -> i32 {
   a + b
 }
 
-static INIT_ONCE: std::sync::Once = std::sync::Once::new();
-
-/// log print to console or file
-fn log_print_to_console_or_file() {
-  INIT_ONCE.call_once(|| {
-    let home_dir = match std::env::var("HOME") {
-      Ok(dir) => dir,
-      Err(_) => "/tmp".to_string(),
-    };
-    // FIXME log to file, now there are files but no content.
-    let file_appender = tracing_appender::rolling::daily(home_dir + "/logs/nacos", "nacos.log");
-    let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
+lazy_static::lazy_static! {
+    static ref LOG_GUARD: tracing_appender::non_blocking::WorkerGuard = {
+      let home_dir = match std::env::var("HOME") {
+        Ok(dir) => dir,
+        Err(_) => "/tmp".to_string(),
+      };
+      let file_appender = tracing_appender::rolling::daily(home_dir + "/logs/nacos", "nacos.log");
+      let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
 
     tracing_subscriber::fmt()
       .with_writer(non_blocking)
@@ -30,7 +26,14 @@ fn log_print_to_console_or_file() {
       .with_thread_ids(true)
       .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
       .init();
-  });
+       guard
+    };
+
+}
+
+/// log print to console or file
+fn init_logger() -> &'static tracing_appender::non_blocking::WorkerGuard {
+  &LOG_GUARD
 }
 
 #[napi(object)]

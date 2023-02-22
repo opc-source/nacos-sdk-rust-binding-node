@@ -7,6 +7,7 @@ use std::sync::Arc;
 #[napi]
 pub struct NacosConfigClient {
   inner: Arc<Mutex<dyn nacos_sdk::api::config::ConfigService + Send + Sync + 'static>>,
+  
 }
 
 #[napi]
@@ -23,7 +24,7 @@ impl NacosConfigClient {
     >,
   ) -> Result<NacosConfigClient> {
     // print to console or file
-    crate::log_print_to_console_or_file();
+    let _ = crate::init_logger();
 
     let props = nacos_sdk::api::props::ClientProps::new()
       .server_addr(client_options.server_addr)
