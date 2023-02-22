@@ -17,6 +17,7 @@ fn log_print_to_console_or_file() {
       Ok(dir) => dir,
       Err(_) => "/tmp".to_string(),
     };
+    // FIXME log to file, now there are files but no content.
     let file_appender = tracing_appender::rolling::daily(home_dir + "/logs/nacos", "nacos.log");
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
 
