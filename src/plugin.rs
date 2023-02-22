@@ -1,5 +1,5 @@
 use napi::threadsafe_function::*;
-use std::sync::{Arc, mpsc::channel};
+use std::sync::Arc;
 
 /// [`config_filter`] It is an advanced feature that does not need to be used by default;
 /// For example: 1. Encrypt ConfigReq.content value and then request; 2. Decrypt ConfigResp.content to get the value.
@@ -22,7 +22,7 @@ impl nacos_sdk::api::plugin::ConfigFilter for NacosConfigFilter {
         encrypted_data_key: config_req.encrypted_data_key.clone(),
       };
 
-      let ref_config_req = config_req as *mut nacos_sdk::api::plugin::ConfigReq;
+      let (tx, rx) = std::sync::mpsc::channel();
       self.func.clone().call_with_return_value(
         Ok((Some(js_config_req), None)),
         ThreadsafeFunctionCallMode::Blocking,
@@ -31,16 +31,17 @@ impl nacos_sdk::api::plugin::ConfigFilter for NacosConfigFilter {
           Option<NacosConfigResp>,
         )| {
           let after_js_config_req = after_js_config_req.unwrap();
-          unsafe {
-            (*ref_config_req).data_id = after_js_config_req.data_id;
-            (*ref_config_req).group = after_js_config_req.group;
-            (*ref_config_req).namespace = after_js_config_req.namespace;
-            (*ref_config_req).content = after_js_config_req.content;
-            (*ref_config_req).encrypted_data_key = after_js_config_req.encrypted_data_key;
-          }
+          let _ = tx.send(after_js_config_req);
           Ok(())
         },
       );
+
+      let ret = rx.recv().unwrap();
+      config_req.data_id = ret.data_id;
+      config_req.group = ret.group;
+      config_req.namespace = ret.namespace;
+      config_req.content = ret.content;
+      config_req.encrypted_data_key = ret.encrypted_data_key;
     }
 
     if let Some(config_resp) = config_resp {
@@ -52,9 +53,7 @@ impl nacos_sdk::api::plugin::ConfigFilter for NacosConfigFilter {
         encrypted_data_key: config_resp.encrypted_data_key.clone(),
       };
 
-      // let ref_config_resp= config_resp as *mut nacos_sdk::api::plugin::ConfigResp;
-
-      let (tx, rx) = channel::<NacosConfigResp>();
+      let (tx, rx) = std::sync::mpsc::channel();
       self.func.clone().call_with_return_value(
         Ok((None, Some(js_config_resp))),
         ThreadsafeFunctionCallMode::Blocking,
@@ -63,28 +62,17 @@ impl nacos_sdk::api::plugin::ConfigFilter for NacosConfigFilter {
           Option<NacosConfigResp>,
         )| {
           let after_js_config_resp = after_js_config_resp.unwrap();
-          println!("after_js_config_resp.content => {}", after_js_config_resp.content);
-          // FIXME now has err: pointer being freed was not allocated
-          // unsafe {
-          //   (*ref_config_resp).data_id = after_js_config_resp.data_id;
-          //   (*ref_config_resp).group = after_js_config_resp.group;
-          //   (*ref_config_resp).namespace = after_js_config_resp.namespace;
-          //   (*ref_config_resp).content = after_js_config_resp.content;
-          //   (*ref_config_resp).encrypted_data_key = after_js_config_resp.encrypted_data_key;
-          // }
           let _ = tx.send(after_js_config_resp);
           Ok(())
         },
       );
 
       let ret = rx.recv().unwrap();
-
       config_resp.data_id = ret.data_id;
       config_resp.group = ret.group;
       config_resp.namespace = ret.namespace;
       config_resp.content = ret.content;
       config_resp.encrypted_data_key = ret.encrypted_data_key;
-      println!("the end filter")
     }
   }
 }

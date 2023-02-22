@@ -47,8 +47,9 @@ function sleep(time){
   await sleep(1000);
 
   console.log('--------- get all instances 1 ------------');
-  var instance_arr = nacos_naming_client.getAllInstances(serviceName, group); // If it fails, pay attention to err
-  console.log(instance_arr);
+  nacos_naming_client.getAllInstances(serviceName, group).then(instance_arr => {
+    console.log(instance_arr);
+  });
   await sleep(1000);
 
   console.log('--------- batchRegisterInstance instance2 ------------');
@@ -56,8 +57,9 @@ function sleep(time){
   await sleep(1000);
 
   console.log('--------- get all instances 2 ------------');
-  var instance_arr = nacos_naming_client.getAllInstances(serviceName, group); // If it fails, pay attention to err
-  console.log(instance_arr);
+  nacos_naming_client.getAllInstances(serviceName, group).then(instance_arr => {
+    console.log(instance_arr);
+  });
 
   await sleep(300000);
   process.exit(0);

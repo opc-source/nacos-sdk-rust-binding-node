@@ -1,12 +1,12 @@
 #![deny(clippy::all)]
 
-use napi::{bindgen_prelude::*, threadsafe_function::*};
+use napi::{bindgen_prelude::*, threadsafe_function::*, tokio::sync::Mutex};
 use std::sync::Arc;
 
 /// Client api of Nacos Naming.
 #[napi]
 pub struct NacosNamingClient {
-  inner: Box<dyn nacos_sdk::api::naming::NamingService>,
+  inner: Arc<Mutex<dyn nacos_sdk::api::naming::NamingService + Send + Sync + 'static>>,
 }
 
 #[napi]
@@ -48,21 +48,21 @@ impl NacosNamingClient {
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(NacosNamingClient {
-      inner: Box::new(naming_service),
+      inner: Arc::new(Mutex::new(naming_service)),
     })
   }
 
   /// Register instance.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn register_instance(
+  pub async fn register_instance(
     &self,
     service_name: String,
     group: String,
     service_instance: NacosServiceInstance,
   ) -> Result<()> {
-    self
-      .inner
+    let inner = self.inner.lock().await;
+    inner
       .register_service(
         service_name,
         Some(group),
@@ -74,14 +74,14 @@ impl NacosNamingClient {
   /// Deregister instance.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn deregister_instance(
+  pub async fn deregister_instance(
     &self,
     service_name: String,
     group: String,
     service_instance: NacosServiceInstance,
   ) -> Result<()> {
-    self
-      .inner
+    let inner = self.inner.lock().await;
+    inner
       .deregister_instance(
         service_name,
         Some(group),
@@ -93,7 +93,7 @@ impl NacosNamingClient {
   /// Batch register instance, improve interaction efficiency.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn batch_register_instance(
+  pub async fn batch_register_instance(
     &self,
     service_name: String,
     group: String,
@@ -104,8 +104,8 @@ impl NacosNamingClient {
       .map(transfer_js_instance_to_rust)
       .collect();
 
-    self
-      .inner
+    let inner = self.inner.lock().await;
+    inner
       .batch_register_instance(service_name, Some(group), rust_instances)
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
@@ -113,16 +113,15 @@ impl NacosNamingClient {
   /// Get all instances by service and group. default cluster=[], subscribe=true.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn get_all_instances(
+  pub async fn get_all_instances(
     &self,
     service_name: String,
     group: String,
     clusters: Option<Vec<String>>,
-    #[napi(ts_arg_type = "boolean = true")]
-    subscribe: Option<bool>,
+    #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
   ) -> Result<Vec<NacosServiceInstance>> {
-    let rust_instances = self
-      .inner
+    let inner = self.inner.lock().await;
+    let rust_instances = inner
       .get_all_instances(
         service_name,
         Some(group),
@@ -142,18 +141,16 @@ impl NacosNamingClient {
   /// Select instances whether healthy or not. default cluster=[], subscribe=true, healthy=true.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn select_instances(
+  pub async fn select_instances(
     &self,
     service_name: String,
     group: String,
     clusters: Option<Vec<String>>,
-    #[napi(ts_arg_type = "boolean = true")]
-    subscribe: Option<bool>,
-    #[napi(ts_arg_type = "boolean = true")]
-    healthy: Option<bool>,
+    #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
+    #[napi(ts_arg_type = "boolean = true")] healthy: Option<bool>,
   ) -> Result<Vec<NacosServiceInstance>> {
-    let rust_instances = self
-      .inner
+    let inner = self.inner.lock().await;
+    let rust_instances = inner
       .select_instance(
         service_name,
         Some(group),
@@ -174,16 +171,15 @@ impl NacosNamingClient {
   /// Select one healthy instance. default cluster=[], subscribe=true.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn select_one_healthy_instance(
+  pub async fn select_one_healthy_instance(
     &self,
     service_name: String,
     group: String,
     clusters: Option<Vec<String>>,
-    #[napi(ts_arg_type = "boolean = true")]
-    subscribe: Option<bool>,
+    #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
   ) -> Result<NacosServiceInstance> {
-    let rust_instance = self
-      .inner
+    let inner = self.inner.lock().await;
+    let rust_instance = inner
       .select_one_healthy_instance(
         service_name,
         Some(group),
@@ -198,15 +194,15 @@ impl NacosNamingClient {
   /// Add NacosNamingEventListener callback func, which listen the instance change.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn subscribe(
+  pub async fn subscribe(
     &self,
     service_name: String,
     group: String,
     clusters: Option<Vec<String>>,
     listener: ThreadsafeFunction<Vec<NacosServiceInstance>>,
   ) -> Result<()> {
-    self
-      .inner
+    let inner = self.inner.lock().await;
+    inner
       .subscribe(
         service_name,
         Some(group),

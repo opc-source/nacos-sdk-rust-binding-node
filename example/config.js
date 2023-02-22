@@ -11,11 +11,13 @@ const nacos_config_client = new NacosConfigClient({
 
 try {
     // If it fails, pay attention to err
-    var conf_content = nacos_config_client.getConfig('hongwen.properties', 'LOVE');
-    console.log(conf_content);
+    nacos_config_client.getConfig('hongwen.properties', 'LOVE').then(data => {
+        console.log('getConfig => ' + data);
+    });
 
-    var config_resp = nacos_config_client.getConfigResp('hongwen.properties', 'LOVE');
-    console.log(config_resp.content);
+    nacos_config_client.getConfigResp('hongwen.properties', 'LOVE').then(data => {
+        console.log('getConfigResp => ' + JSON.stringify(data));
+    });
 } catch(e) {
     console.log(e);
 }

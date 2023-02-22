@@ -116,35 +116,35 @@ export class NacosNamingClient {
    * Register instance.
    * If it fails, pay attention to err
    */
-  registerInstance(serviceName: string, group: string, serviceInstance: NacosServiceInstance): void
+  registerInstance(serviceName: string, group: string, serviceInstance: NacosServiceInstance): Promise<void>
   /**
    * Deregister instance.
    * If it fails, pay attention to err
    */
-  deregisterInstance(serviceName: string, group: string, serviceInstance: NacosServiceInstance): void
+  deregisterInstance(serviceName: string, group: string, serviceInstance: NacosServiceInstance): Promise<void>
   /**
    * Batch register instance, improve interaction efficiency.
    * If it fails, pay attention to err
    */
-  batchRegisterInstance(serviceName: string, group: string, serviceInstances: Array<NacosServiceInstance>): void
+  batchRegisterInstance(serviceName: string, group: string, serviceInstances: Array<NacosServiceInstance>): Promise<void>
   /**
    * Get all instances by service and group. default cluster=[], subscribe=true.
    * If it fails, pay attention to err
    */
-  getAllInstances(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true): Array<NacosServiceInstance>
+  getAllInstances(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true): Promise<Array<NacosServiceInstance>>
   /**
    * Select instances whether healthy or not. default cluster=[], subscribe=true, healthy=true.
    * If it fails, pay attention to err
    */
-  selectInstances(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true, healthy?: boolean = true): Array<NacosServiceInstance>
+  selectInstances(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true, healthy?: boolean = true): Promise<Array<NacosServiceInstance>>
   /**
    * Select one healthy instance. default cluster=[], subscribe=true.
    * If it fails, pay attention to err
    */
-  selectOneHealthyInstance(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true): NacosServiceInstance
+  selectOneHealthyInstance(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true): Promise<NacosServiceInstance>
   /**
    * Add NacosNamingEventListener callback func, which listen the instance change.
    * If it fails, pay attention to err
    */
-  subscribe(serviceName: string, group: string, clusters: Array<string> | undefined | null, listener: (err: Error | null, value: Array<NacosServiceInstance>) => any): void
+  subscribe(serviceName: string, group: string, clusters: Array<string> | undefined | null, listener: (err: Error | null, value: Array<NacosServiceInstance>) => any): Promise<void>
 }
