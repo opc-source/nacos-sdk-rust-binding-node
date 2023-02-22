@@ -86,27 +86,27 @@ export class NacosConfigClient {
    * Get config's content.
    * If it fails, pay attention to err
    */
-  getConfig(dataId: string, group: string): string
+  getConfig(dataId: string, group: string): Promise<string>
   /**
    * Get NacosConfigResponse.
    * If it fails, pay attention to err
    */
-  getConfigResp(dataId: string, group: string): NacosConfigResponse
+  getConfigResp(dataId: string, group: string): Promise<NacosConfigResponse>
   /**
    * Publish config.
    * If it fails, pay attention to err
    */
-  publishConfig(dataId: string, group: string, content: string): boolean
+  publishConfig(dataId: string, group: string, content: string): Promise<boolean>
   /**
    * Remove config.
    * If it fails, pay attention to err
    */
-  removeConfig(dataId: string, group: string): boolean
+  removeConfig(dataId: string, group: string): Promise<boolean>
   /**
    * Add NacosConfigChangeListener callback func, which listen the config change.
    * If it fails, pay attention to err
    */
-  addListener(dataId: string, group: string, listener: (err: Error | null, value: NacosConfigResponse) => any): void
+  addListener(dataId: string, group: string, listener: (err: Error | null, value: NacosConfigResponse) => any): Promise<void>
 }
 /** Client api of Nacos Naming. */
 export class NacosNamingClient {

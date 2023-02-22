@@ -1,12 +1,13 @@
 #![deny(clippy::all)]
 
-use napi::{bindgen_prelude::*, threadsafe_function::*};
+use napi::{bindgen_prelude::*, threadsafe_function::*, tokio::sync::Mutex};
 use std::sync::Arc;
+
 
 /// Client api of Nacos Config.
 #[napi]
 pub struct NacosConfigClient {
-  inner: Box<dyn nacos_sdk::api::config::ConfigService>,
+  inner: Arc<Mutex<dyn nacos_sdk::api::config::ConfigService + Send + Sync + 'static>>,
 }
 
 #[napi]
@@ -64,40 +65,47 @@ impl NacosConfigClient {
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(NacosConfigClient {
-      inner: Box::new(config_service),
+      inner: Arc::new(Mutex::new(config_service)),
     })
   }
 
   /// Get config's content.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn get_config(&mut self, data_id: String, group: String) -> Result<String> {
-    Ok(self.get_config_resp(data_id, group)?.content)
+  pub async fn get_config(&self, data_id: String, group: String) -> Result<String> {
+    let resp = self.get_config_resp(data_id, group).await?;
+    Ok(resp.content)
   }
 
   /// Get NacosConfigResponse.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn get_config_resp(&mut self, data_id: String, group: String) -> Result<NacosConfigResponse> {
-    let config_resp = self
-      .inner
-      .get_config(data_id, group)
-      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+  pub async fn get_config_resp(&self, data_id: String, group: String) -> Result<NacosConfigResponse> {
 
+    let mut inner = self.inner.lock().await;
+    let config_resp = inner.get_config(data_id, group).map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
     Ok(transfer_conf_resp(config_resp))
+   
+
+    // let config_resp = self
+    //   .inner
+    //   .get_config(data_id, group)
+    //   .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+
+    // Ok(transfer_conf_resp(config_resp))
   }
 
   /// Publish config.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn publish_config(
-    &mut self,
+  pub async fn publish_config(
+    &self,
     data_id: String,
     group: String,
     content: String,
   ) -> Result<bool> {
-    self
-      .inner
+    let mut inner = self.inner.lock().await;
+    inner
       .publish_config(data_id, group, content, None)
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
@@ -105,9 +113,9 @@ impl NacosConfigClient {
   /// Remove config.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn remove_config(&mut self, data_id: String, group: String) -> Result<bool> {
-    self
-      .inner
+  pub async fn remove_config(&self, data_id: String, group: String) -> Result<bool> {
+    let mut inner = self.inner.lock().await;
+    inner
       .remove_config(data_id, group)
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
@@ -115,14 +123,14 @@ impl NacosConfigClient {
   /// Add NacosConfigChangeListener callback func, which listen the config change.
   /// If it fails, pay attention to err
   #[napi]
-  pub fn add_listener(
-    &mut self,
+  pub async fn add_listener(
+    &self,
     data_id: String,
     group: String,
     listener: ThreadsafeFunction<NacosConfigResponse>,
   ) -> Result<()> {
-    self
-      .inner
+    let mut inner = self.inner.lock().await;
+    inner
       .add_listener(
         data_id,
         group,
