@@ -5,7 +5,7 @@ const { NacosConfigClient, NacosConfigResponse } = require('../index')
 // If it fails, pay attention to err
 const nacos_config_client = new NacosConfigClient(
 {
-    serverAddr: '0.0.0.0:8848',
+    serverAddr: '127.0.0.1:8848',
     namespace: "hongwen",
     appName: "binding-node-example-app"
 },
@@ -18,11 +18,14 @@ const nacos_config_client = new NacosConfigClient(
 
 try {
     // If it fails, pay attention to err
-    var conf_content = nacos_config_client.getConfig('hongwen.properties', 'LOVE');
-    console.log(conf_content);
+    var promise1 = nacos_config_client.getConfig('hongwen.properties', 'LOVE').then(data => {
+        console.log(data);
+    });
+   
 
-    var config_resp = nacos_config_client.getConfigResp('hongwen.properties', 'LOVE');
-    console.log(config_resp.content);
+    var promise2 = nacos_config_client.getConfigResp('hongwen.properties', 'LOVE').then((data) => {
+        console.log(data);
+    });
 } catch(e) {
     console.log(e);
 }
