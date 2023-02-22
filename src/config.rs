@@ -3,7 +3,6 @@
 use napi::{bindgen_prelude::*, threadsafe_function::*, tokio::sync::Mutex};
 use std::sync::Arc;
 
-
 /// Client api of Nacos Config.
 #[napi]
 pub struct NacosConfigClient {
@@ -80,19 +79,16 @@ impl NacosConfigClient {
   /// Get NacosConfigResponse.
   /// If it fails, pay attention to err
   #[napi]
-  pub async fn get_config_resp(&self, data_id: String, group: String) -> Result<NacosConfigResponse> {
-
+  pub async fn get_config_resp(
+    &self,
+    data_id: String,
+    group: String,
+  ) -> Result<NacosConfigResponse> {
     let mut inner = self.inner.lock().await;
-    let config_resp = inner.get_config(data_id, group).map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+    let config_resp = inner
+      .get_config(data_id, group)
+      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
     Ok(transfer_conf_resp(config_resp))
-   
-
-    // let config_resp = self
-    //   .inner
-    //   .get_config(data_id, group)
-    //   .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
-
-    // Ok(transfer_conf_resp(config_resp))
   }
 
   /// Publish config.

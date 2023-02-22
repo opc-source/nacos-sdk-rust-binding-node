@@ -10,21 +10,22 @@ const nacos_config_client = new NacosConfigClient(
     appName: "binding-node-example-app"
 },
 (err, config_req, config_resp) => {
- console.log(config_resp)
- config_resp.content = "func config_decrypt change it."
- return [config_req, config_resp];
+    // config_req or config_resp only one not null. e.g. you can do encrypt for config_req, decrypt for config_resp.
+    if (config_resp != null) {
+        config_resp.content = "func config_decrypt change it." // TODO by customize
+    }
+    return [config_req, config_resp];
 }
 );
 
 try {
     // If it fails, pay attention to err
-    var promise1 = nacos_config_client.getConfig('hongwen.properties', 'LOVE').then(data => {
-        console.log(data);
+    nacos_config_client.getConfig('hongwen.properties', 'LOVE').then(data => {
+        console.log('getConfig => ' + data);
     });
    
-
-    var promise2 = nacos_config_client.getConfigResp('hongwen.properties', 'LOVE').then((data) => {
-        console.log(data);
+    nacos_config_client.getConfigResp('hongwen.properties', 'LOVE').then((data) => {
+        console.log('getConfigResp => ' + JSON.stringify(data));
     });
 } catch(e) {
     console.log(e);
