@@ -1,13 +1,8 @@
 {
   "name": "nacos-sdk-rust-binding-node",
   "description": "nacos-sdk-rust binding for NodeJs with napi.",
-  "keywords": [
-    "nacos",
-    "napi",
-    "binding",
-    "ffi"
-  ],
-  "version": "0.0.2",
+  "keywords": [ "nacos", "napi", "binding", "ffi" ],
+  "version": "0.0.1",
   "bugs": "https://github.com/opc-source/nacos-sdk-rust-binding-node/issues",
   "license": "MIT",
   "repository": {

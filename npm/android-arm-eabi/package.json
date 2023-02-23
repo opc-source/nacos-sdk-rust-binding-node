@@ -1,6 +1,6 @@
 {
   "name": "nacos-sdk-rust-binding-node-android-arm-eabi",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "os": [
     "android"
   ],
