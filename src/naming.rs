@@ -15,7 +15,7 @@ impl NacosNamingClient {
   #[napi(constructor)]
   pub fn new(client_options: crate::ClientOptions) -> Result<NacosNamingClient> {
     // print to console or file
-    crate::log_print_to_console_or_file();
+    let _ = crate::init_logger();
 
     let props = nacos_sdk::api::props::ClientProps::new()
       .server_addr(client_options.server_addr)
