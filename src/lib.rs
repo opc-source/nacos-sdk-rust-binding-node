@@ -17,16 +17,16 @@ lazy_static::lazy_static! {
       let file_appender = tracing_appender::rolling::daily(home_dir + "/logs/nacos", "nacos.log");
       let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
 
-    tracing_subscriber::fmt()
-      .with_writer(non_blocking)
-      .with_thread_names(true)
-      .with_file(true)
-      .with_level(true)
-      .with_line_number(true)
-      .with_thread_ids(true)
-      .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
-      .init();
-       guard
+      tracing_subscriber::fmt()
+        .with_writer(non_blocking)
+        .with_level(true)
+        .with_thread_names(true)
+        .with_thread_ids(true)
+        .with_line_number(true)
+        .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
+        .init();
+
+      guard
     };
 
 }
