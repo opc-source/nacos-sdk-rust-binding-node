@@ -7,7 +7,6 @@ use std::sync::Arc;
 #[napi]
 pub struct NacosConfigClient {
   inner: Arc<Mutex<dyn nacos_sdk::api::config::ConfigService + Send + Sync + 'static>>,
-  
 }
 
 #[napi]
