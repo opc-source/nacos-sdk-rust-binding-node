@@ -1,12 +1,12 @@
 #![deny(clippy::all)]
 
-use napi::{bindgen_prelude::*, threadsafe_function::*, tokio::sync::Mutex};
+use napi::{bindgen_prelude::*, threadsafe_function::*};
 use std::sync::Arc;
 
 /// Client api of Nacos Config.
 #[napi]
 pub struct NacosConfigClient {
-  inner: Arc<Mutex<dyn nacos_sdk::api::config::ConfigService + Send + Sync + 'static>>,
+  inner: Arc<dyn nacos_sdk::api::config::ConfigService + Send + Sync + 'static>,
 }
 
 #[napi]
@@ -64,7 +64,7 @@ impl NacosConfigClient {
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(NacosConfigClient {
-      inner: Arc::new(Mutex::new(config_service)),
+      inner: Arc::new(config_service),
     })
   }
 
@@ -84,9 +84,10 @@ impl NacosConfigClient {
     data_id: String,
     group: String,
   ) -> Result<NacosConfigResponse> {
-    let mut inner = self.inner.lock().await;
-    let config_resp = inner
+    let config_resp = self
+      .inner
       .get_config(data_id, group)
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
     Ok(transfer_conf_resp(config_resp))
   }
@@ -100,9 +101,10 @@ impl NacosConfigClient {
     group: String,
     content: String,
   ) -> Result<bool> {
-    let mut inner = self.inner.lock().await;
-    inner
+    self
+      .inner
       .publish_config(data_id, group, content, None)
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
@@ -110,9 +112,10 @@ impl NacosConfigClient {
   /// If it fails, pay attention to err
   #[napi]
   pub async fn remove_config(&self, data_id: String, group: String) -> Result<bool> {
-    let mut inner = self.inner.lock().await;
-    inner
+    self
+      .inner
       .remove_config(data_id, group)
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
@@ -125,8 +128,8 @@ impl NacosConfigClient {
     group: String,
     listener: ThreadsafeFunction<NacosConfigResponse>,
   ) -> Result<()> {
-    let mut inner = self.inner.lock().await;
-    inner
+    self
+      .inner
       .add_listener(
         data_id,
         group,
@@ -134,6 +137,7 @@ impl NacosConfigClient {
           func: Arc::new(listener),
         }),
       )
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
     Ok(())
   }

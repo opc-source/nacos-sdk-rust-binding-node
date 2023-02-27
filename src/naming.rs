@@ -1,12 +1,12 @@
 #![deny(clippy::all)]
 
-use napi::{bindgen_prelude::*, threadsafe_function::*, tokio::sync::Mutex};
+use napi::{bindgen_prelude::*, threadsafe_function::*};
 use std::sync::Arc;
 
 /// Client api of Nacos Naming.
 #[napi]
 pub struct NacosNamingClient {
-  inner: Arc<Mutex<dyn nacos_sdk::api::naming::NamingService + Send + Sync + 'static>>,
+  inner: Arc<dyn nacos_sdk::api::naming::NamingService + Send + Sync + 'static>,
 }
 
 #[napi]
@@ -48,7 +48,7 @@ impl NacosNamingClient {
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(NacosNamingClient {
-      inner: Arc::new(Mutex::new(naming_service)),
+      inner: Arc::new(naming_service),
     })
   }
 
@@ -61,13 +61,14 @@ impl NacosNamingClient {
     group: String,
     service_instance: NacosServiceInstance,
   ) -> Result<()> {
-    let inner = self.inner.lock().await;
-    inner
-      .register_service(
+    self
+      .inner
+      .register_instance(
         service_name,
         Some(group),
         transfer_js_instance_to_rust(&service_instance),
       )
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
@@ -80,13 +81,14 @@ impl NacosNamingClient {
     group: String,
     service_instance: NacosServiceInstance,
   ) -> Result<()> {
-    let inner = self.inner.lock().await;
-    inner
+    self
+      .inner
       .deregister_instance(
         service_name,
         Some(group),
         transfer_js_instance_to_rust(&service_instance),
       )
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
@@ -104,9 +106,10 @@ impl NacosNamingClient {
       .map(transfer_js_instance_to_rust)
       .collect();
 
-    let inner = self.inner.lock().await;
-    inner
+    self
+      .inner
       .batch_register_instance(service_name, Some(group), rust_instances)
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
   }
 
@@ -120,14 +123,15 @@ impl NacosNamingClient {
     clusters: Option<Vec<String>>,
     #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
   ) -> Result<Vec<NacosServiceInstance>> {
-    let inner = self.inner.lock().await;
-    let rust_instances = inner
+    let rust_instances = self
+      .inner
       .get_all_instances(
         service_name,
         Some(group),
         clusters.unwrap_or_default(),
         subscribe.unwrap_or(true),
       )
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(
@@ -149,15 +153,16 @@ impl NacosNamingClient {
     #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
     #[napi(ts_arg_type = "boolean = true")] healthy: Option<bool>,
   ) -> Result<Vec<NacosServiceInstance>> {
-    let inner = self.inner.lock().await;
-    let rust_instances = inner
-      .select_instance(
+    let rust_instances = self
+      .inner
+      .select_instances(
         service_name,
         Some(group),
         clusters.unwrap_or_default(),
         subscribe.unwrap_or(true),
         healthy.unwrap_or(true),
       )
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(
@@ -178,14 +183,15 @@ impl NacosNamingClient {
     clusters: Option<Vec<String>>,
     #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
   ) -> Result<NacosServiceInstance> {
-    let inner = self.inner.lock().await;
-    let rust_instance = inner
+    let rust_instance = self
+      .inner
       .select_one_healthy_instance(
         service_name,
         Some(group),
         clusters.unwrap_or_default(),
         subscribe.unwrap_or(true),
       )
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(transfer_rust_instance_to_js(&rust_instance))
@@ -201,8 +207,8 @@ impl NacosNamingClient {
     clusters: Option<Vec<String>>,
     listener: ThreadsafeFunction<Vec<NacosServiceInstance>>,
   ) -> Result<()> {
-    let inner = self.inner.lock().await;
-    inner
+    self
+      .inner
       .subscribe(
         service_name,
         Some(group),
@@ -211,6 +217,7 @@ impl NacosNamingClient {
           func: Arc::new(listener),
         }),
       )
+      .await
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
     Ok(())
   }
