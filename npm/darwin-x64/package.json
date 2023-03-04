@@ -1,6 +1,6 @@
 {
   "name": "nacos-sdk-rust-binding-node-darwin-x64",
-  "version": "0.0.2",
+  "version": "0.1.0-BETA",
   "os": [
     "darwin"
   ],
