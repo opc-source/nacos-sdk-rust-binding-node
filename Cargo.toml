@@ -18,7 +18,9 @@ crate-type = ["cdylib"]
 napi = { version = "2", default-features = false, features = ["napi4", "async"] }
 napi-derive = "2"
 
-nacos-sdk = { version = "0.2.3", features = ["async"] }
+#nacos-sdk = { version = "0.2.3", features = ["async"] }
+nacos-sdk = { git = "https://github.com/nacos-group/nacos-sdk-rust.git", features = ["async"] }
+
 tracing-subscriber = "0.3"
 tracing-appender = "0.2"
 lazy_static = "1.4.0"
