@@ -7,7 +7,7 @@
     "binding",
     "ffi"
   ],
-  "version": "0.1.0-BETA",
+  "version": "0.1.0-PRE",
   "bugs": "https://github.com/opc-source/nacos-sdk-rust-binding-node/issues",
   "license": "MIT",
   "repository": {
