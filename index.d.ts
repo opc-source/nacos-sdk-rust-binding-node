@@ -107,6 +107,12 @@ export class NacosConfigClient {
    * If it fails, pay attention to err
    */
   addListener(dataId: string, group: string, listener: (err: Error | null, value: NacosConfigResponse) => any): Promise<void>
+  /**
+   * Remove NacosConfigChangeListener callback func, but noop....
+   * The logic is not implemented internally, and only APIs are provided as compatibility.
+   * Users maybe do not need it? Not removing the listener is not a big problem, Sorry!
+   */
+  removeListener(dataId: string, group: string, listener: (err: Error | null, value: NacosConfigResponse) => any): Promise<void>
 }
 /** Client api of Nacos Naming. */
 export class NacosNamingClient {
@@ -147,4 +153,10 @@ export class NacosNamingClient {
    * If it fails, pay attention to err
    */
   subscribe(serviceName: string, group: string, clusters: Array<string> | undefined | null, listener: (err: Error | null, value: Array<NacosServiceInstance>) => any): Promise<void>
+  /**
+   * Remove NacosNamingEventListener callback func, but noop....
+   * The logic is not implemented internally, and only APIs are provided as compatibility.
+   * Users maybe do not need it? Not removing the subscription is not a big problem, Sorry!
+   */
+  unSubscribe(serviceName: string, group: string, clusters: Array<string> | undefined | null, listener: (err: Error | null, value: Array<NacosServiceInstance>) => any): Promise<void>
 }

@@ -141,6 +141,19 @@ impl NacosConfigClient {
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
     Ok(())
   }
+
+  /// Remove NacosConfigChangeListener callback func, but noop....
+  /// The logic is not implemented internally, and only APIs are provided as compatibility.
+  /// Users maybe do not need it? Not removing the listener is not a big problem, Sorry!
+  #[napi]
+  pub async fn remove_listener(
+    &self,
+    _data_id: String,
+    _group: String,
+    _listener: ThreadsafeFunction<NacosConfigResponse>,
+  ) -> Result<()> {
+    Ok(())
+  }
 }
 
 #[napi(object)]

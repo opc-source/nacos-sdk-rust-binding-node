@@ -221,6 +221,20 @@ impl NacosNamingClient {
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
     Ok(())
   }
+
+  /// Remove NacosNamingEventListener callback func, but noop....
+  /// The logic is not implemented internally, and only APIs are provided as compatibility.
+  /// Users maybe do not need it? Not removing the subscription is not a big problem, Sorry!
+  #[napi]
+  pub async fn un_subscribe(
+    &self,
+    _service_name: String,
+    _group: String,
+    _clusters: Option<Vec<String>>,
+    _listener: ThreadsafeFunction<Vec<NacosServiceInstance>>,
+  ) -> Result<()> {
+    Ok(())
+  }
 }
 
 pub struct NacosNamingEventListener {
