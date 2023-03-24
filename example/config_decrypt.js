@@ -12,8 +12,12 @@ const nacos_config_client = new NacosConfigClient(
 (err, config_req, config_resp) => {
     // config_req or config_resp only one not null. e.g. you can do encrypt for config_req, decrypt for config_resp.
     if (config_resp != null) {
-        config_resp.content = "func config_decrypt change it." // TODO by customize
+        config_resp.content = "func config_decrypt change it." // TODO by customize and please care about encryptedDataKey whether not null
     }
+    if (config_req != null) {
+        // config_req.content = "encrypt content." // TODO by customize and please care about encryptedDataKey whether not null
+    }
+    // !!! must return them !!!
     return [config_req, config_resp];
 }
 );

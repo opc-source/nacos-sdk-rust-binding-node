@@ -51,9 +51,9 @@ impl NacosConfigClient {
       nacos_sdk::api::config::ConfigServiceBuilder::new(props)
     };
 
-    let config_service_builder = if config_filter.is_some() {
+    let config_service_builder = if let Some(filter) = config_filter {
       config_service_builder.add_config_filter(Box::new(crate::NacosConfigFilter {
-        func: Arc::new(config_filter.unwrap()),
+        func: Arc::new(filter),
       }))
     } else {
       config_service_builder
