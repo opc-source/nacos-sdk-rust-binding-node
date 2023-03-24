@@ -1,6 +1,6 @@
 {
   "name": "nacos-sdk-rust-binding-node-linux-arm64-musl",
-  "version": "0.1.0-PRE",
+  "version": "0.1.0-PRE2",
   "os": [
     "linux"
   ],
