@@ -1,6 +1,6 @@
 {
   "name": "nacos-sdk-rust-binding-node-android-arm64",
-  "version": "0.1.0-RC",
+  "version": "0.1.0",
   "os": [
     "android"
   ],
