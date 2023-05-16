@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "nacos-sdk-rust-binding-node"
-version = "0.1.0"
+version = "0.3.0"
 authors = ["CheirshCai <785427346@qq.com>"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -18,7 +18,7 @@ crate-type = ["cdylib"]
 napi = { version = "2", default-features = false, features = ["napi4", "async"] }
 napi-derive = "2"
 
-nacos-sdk = { version = "0.2.6", features = ["async"] }
+nacos-sdk = { version = "0.3.0-alpha", features = ["async"] }
 #nacos-sdk = { git = "https://github.com/nacos-group/nacos-sdk-rust.git", features = ["async"] }
 
 tracing-subscriber = { version = "0.3", features = ["env-filter", "local-time"] }
