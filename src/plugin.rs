@@ -7,8 +7,9 @@ pub struct NacosConfigFilter {
   pub(crate) func: Arc<ThreadsafeFunction<(Option<NacosConfigReq>, Option<NacosConfigResp>)>>,
 }
 
+#[async_trait::async_trait]
 impl nacos_sdk::api::plugin::ConfigFilter for NacosConfigFilter {
-  fn filter(
+  async fn filter(
     &self,
     config_req: Option<&mut nacos_sdk::api::plugin::ConfigReq>,
     config_resp: Option<&mut nacos_sdk::api::plugin::ConfigResp>,
@@ -22,21 +23,13 @@ impl nacos_sdk::api::plugin::ConfigFilter for NacosConfigFilter {
         encrypted_data_key: config_req.encrypted_data_key.clone(),
       };
 
-      let (tx, rx) = std::sync::mpsc::channel();
-      self.func.clone().call_with_return_value(
-        Ok((Some(js_config_req), None)),
-        ThreadsafeFunctionCallMode::Blocking,
-        move |(after_js_config_req, _after_js_config_resp): (
-          Option<NacosConfigReq>,
-          Option<NacosConfigResp>,
-        )| {
-          let after_js_config_req = after_js_config_req.unwrap();
-          let _ = tx.send(after_js_config_req);
-          Ok(())
-        },
-      );
+      let (after_js_config_req, _): (Option<NacosConfigReq>, Option<NacosConfigResp>) = self
+        .func
+        .call_async(Ok((Some(js_config_req), None)))
+        .await
+        .unwrap();
 
-      let ret = rx.recv().unwrap();
+      let ret = after_js_config_req.unwrap();
       config_req.data_id = ret.data_id;
       config_req.group = ret.group;
       config_req.namespace = ret.namespace;
@@ -53,21 +46,13 @@ impl nacos_sdk::api::plugin::ConfigFilter for NacosConfigFilter {
         encrypted_data_key: config_resp.encrypted_data_key.clone(),
       };
 
-      let (tx, rx) = std::sync::mpsc::channel();
-      self.func.clone().call_with_return_value(
-        Ok((None, Some(js_config_resp))),
-        ThreadsafeFunctionCallMode::Blocking,
-        move |(_after_js_config_req, after_js_config_resp): (
-          Option<NacosConfigReq>,
-          Option<NacosConfigResp>,
-        )| {
-          let after_js_config_resp = after_js_config_resp.unwrap();
-          let _ = tx.send(after_js_config_resp);
-          Ok(())
-        },
-      );
+      let (_, after_js_config_resp): (Option<NacosConfigReq>, Option<NacosConfigResp>) = self
+        .func
+        .call_async(Ok((None, Some(js_config_resp))))
+        .await
+        .unwrap();
 
-      let ret = rx.recv().unwrap();
+      let ret = after_js_config_resp.unwrap();
       config_resp.data_id = ret.data_id;
       config_resp.group = ret.group;
       config_resp.namespace = ret.namespace;

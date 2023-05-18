@@ -19,7 +19,7 @@ lazy_static::lazy_static! {
 
       tracing_subscriber::fmt()
         .with_writer(non_blocking)
-        .with_timer(tracing_subscriber::fmt::time::LocalTime::rfc_3339())
+        // .with_timer(tracing_subscriber::fmt::time::LocalTime::rfc_3339()) // occur `<unknown time>`
         .with_thread_names(true)
         .with_thread_ids(true)
         .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
