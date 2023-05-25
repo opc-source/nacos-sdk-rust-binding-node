@@ -10,6 +10,13 @@ pub fn sum(a: i32, b: i32) -> i32 {
 
 lazy_static::lazy_static! {
     static ref LOG_GUARD: tracing_appender::non_blocking::WorkerGuard = {
+      use std::str::FromStr;
+      use tracing_subscriber::filter::LevelFilter;
+      let log_level = match std::env::var("NACOS_CLIENT_LOGGER_LEVEL") {
+        Ok(level) => LevelFilter::from_str(&level).unwrap_or(LevelFilter::INFO),
+        Err(_) => LevelFilter::INFO,
+      };
+
       let home_dir = match std::env::var("HOME") {
         Ok(dir) => dir,
         Err(_) => "/tmp".to_string(),
@@ -22,7 +29,7 @@ lazy_static::lazy_static! {
         // .with_timer(tracing_subscriber::fmt::time::LocalTime::rfc_3339()) // occur `<unknown time>`
         .with_thread_names(true)
         .with_thread_ids(true)
-        .with_max_level(tracing_subscriber::filter::LevelFilter::INFO)
+        .with_max_level(log_level)
         .init();
 
       guard
