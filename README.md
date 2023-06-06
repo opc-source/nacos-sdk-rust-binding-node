@@ -8,8 +8,6 @@ Tip: nacos-sdk-nodejs 仓库暂未提供 2.x gRPC 交互模式，为了能升级
 
 npm 包 -> https://www.npmjs.com/package/nacos-sdk-rust-binding-node
 
-目前 GitHub Actions CI 仅能打出部分包，若未支持而需要的场景，请提 issue 看怎样提供。
-
 # License
 [Apache License Version 2.0](LICENSE)
 

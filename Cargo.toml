@@ -19,7 +19,7 @@ napi = { version = "2", default-features = false, features = ["napi4", "async"] 
 napi-derive = "2"
 
 #nacos-sdk = { version = "0.3.0-beta", features = ["async"] }
-nacos-sdk = { git = "https://github.com/nacos-group/nacos-sdk-rust.git", features = ["async"] }
+nacos-sdk = { git = "https://github.com/nacos-group/nacos-sdk-rust.git", branch = "try_naming_span_exlude_service_name", features = ["async"] }
 
 tracing-subscriber = { version = "0.3", features = ["default"] }
 #tracing-subscriber = { version = "0.3", features = ["env-filter", "local-time"] } # occur `<unknown time>`
