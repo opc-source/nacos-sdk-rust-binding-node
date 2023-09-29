@@ -15,6 +15,8 @@ export interface ClientOptions {
   username?: string
   /** Password for Auth */
   password?: string
+  /** naming push_empty_protection, default true */
+  namingPushEmptyProtection?: boolean
 }
 export interface NacosConfigResponse {
   /** Namespace/Tenant */

@@ -54,6 +54,8 @@ pub struct ClientOptions {
   pub username: Option<String>,
   /// Password for Auth
   pub password: Option<String>,
+  /// naming push_empty_protection, default true
+  pub naming_push_empty_protection: Option<bool>,
 }
 
 mod config;

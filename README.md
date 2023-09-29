@@ -13,6 +13,10 @@ npm 包 -> https://www.npmjs.com/package/nacos-sdk-rust-binding-node
 
 环境变量 `NACOS_CLIENT_COMMON_THREAD_CORES=4` 可设置客户端核心线程数，默认是 CPU 数目 num_cpus
 
+环境变量 `ENV_NACOS_CLIENT_NAMING_PUSH_EMPTY_PROTECTION=false` 可关闭 Naming 防推空保护，默认 true
+
+更多环境变量请看 `nacos-sdk-rust` 的[文档说明](https://github.com/nacos-group/nacos-sdk-rust)
+
 # License
 [Apache License Version 2.0](LICENSE)
 
