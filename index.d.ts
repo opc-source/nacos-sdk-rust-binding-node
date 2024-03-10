@@ -17,6 +17,8 @@ export interface ClientOptions {
   password?: string
   /** naming push_empty_protection, default true */
   namingPushEmptyProtection?: boolean
+  /** naming load_cache_at_start, default false */
+  namingLoadCacheAtStart?: boolean
 }
 export interface NacosConfigResponse {
   /** Namespace/Tenant */

@@ -56,6 +56,8 @@ pub struct ClientOptions {
   pub password: Option<String>,
   /// naming push_empty_protection, default true
   pub naming_push_empty_protection: Option<bool>,
+  /// naming load_cache_at_start, default false
+  pub naming_load_cache_at_start: Option<bool>,
 }
 
 mod config;
