@@ -1,6 +1,6 @@
 {
   "name": "nacos-sdk-rust-binding-node-win32-ia32-msvc",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "os": [
     "win32"
   ],
