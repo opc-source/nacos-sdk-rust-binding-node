@@ -123,7 +123,7 @@ impl NacosNamingClient {
     service_name: String,
     group: String,
     clusters: Option<Vec<String>>,
-    #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
+    subscribe: Option<bool>,
   ) -> Result<Vec<NacosServiceInstance>> {
     let rust_instances = self
       .inner
@@ -152,8 +152,8 @@ impl NacosNamingClient {
     service_name: String,
     group: String,
     clusters: Option<Vec<String>>,
-    #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
-    #[napi(ts_arg_type = "boolean = true")] healthy: Option<bool>,
+    subscribe: Option<bool>,
+    healthy: Option<bool>,
   ) -> Result<Vec<NacosServiceInstance>> {
     let rust_instances = self
       .inner
@@ -183,7 +183,7 @@ impl NacosNamingClient {
     service_name: String,
     group: String,
     clusters: Option<Vec<String>>,
-    #[napi(ts_arg_type = "boolean = true")] subscribe: Option<bool>,
+    subscribe: Option<bool>,
   ) -> Result<NacosServiceInstance> {
     let rust_instance = self
       .inner
