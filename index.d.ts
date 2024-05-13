@@ -141,17 +141,17 @@ export class NacosNamingClient {
    * Get all instances by service and group. default cluster=[], subscribe=true.
    * If it fails, pay attention to err
    */
-  getAllInstances(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true): Promise<Array<NacosServiceInstance>>
+  getAllInstances(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean | true): Promise<Array<NacosServiceInstance>>
   /**
    * Select instances whether healthy or not. default cluster=[], subscribe=true, healthy=true.
    * If it fails, pay attention to err
    */
-  selectInstances(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true, healthy?: boolean = true): Promise<Array<NacosServiceInstance>>
+  selectInstances(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean | true, healthy?: boolean | true): Promise<Array<NacosServiceInstance>>
   /**
    * Select one healthy instance. default cluster=[], subscribe=true.
    * If it fails, pay attention to err
    */
-  selectOneHealthyInstance(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean = true): Promise<NacosServiceInstance>
+  selectOneHealthyInstance(serviceName: string, group: string, clusters?: Array<string> | undefined | null, subscribe?: boolean | true): Promise<NacosServiceInstance>
   /**
    * Add NacosNamingEventListener callback func, which listen the instance change.
    * If it fails, pay attention to err
