@@ -66,5 +66,3 @@ function sleep(time){
   await sleep(300000);
   process.exit(0);
 })();
-
-
