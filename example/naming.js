@@ -6,8 +6,8 @@ const { NacosNamingClient, NacosServiceInstance } = require('../index')
 // 请注意！一般情况下，应用下仅需一个 Naming 客户端，而且需要长期持有直至应用停止。
 // 因为它内部会初始化与服务端的长链接，后续的数据交互及变更订阅，都是实时地通过长链接告知客户端的。
 const nacos_naming_client = new NacosNamingClient({
-    serverAddr: '0.0.0.0:8848',
-    namespace: "hongwen",
+    serverAddr: '127.0.0.1:8848',
+    namespace: "love",
     appName: "binding-node-example-app"
 });
 
