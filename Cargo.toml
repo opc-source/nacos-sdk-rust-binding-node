@@ -1,9 +1,10 @@
 [package]
-edition = "2021"
 name = "nacos-sdk-rust-binding-node"
-version = "0.4.2"
-authors = ["CheirshCai <785427346@qq.com>"]
+version = "0.5.2"
+edition = "2024"
 license = "Apache-2.0"
+publish = false
+authors = ["CheirshCai <785427346@qq.com>"]
 readme = "README.md"
 repository = "https://github.com/opc-source/nacos-sdk-rust-binding-node"
 description = "nacos-sdk-rust binding for NodeJs with napi."
@@ -18,13 +19,12 @@ crate-type = ["cdylib"]
 napi = { version = "2", default-features = false, features = ["napi4", "async"] }
 napi-derive = "2"
 
-nacos-sdk = { version = "0.4.2", features = ["default", "auth-by-aliyun"] }
+nacos-sdk = { version = "0.5.2", features = ["default", "auth-by-aliyun"] }
 #nacos-sdk = { git = "https://github.com/nacos-group/nacos-sdk-rust.git", branch = "main", features = ["default"] }
 
 tracing-subscriber = { version = "0.3", features = ["default"] }
 #tracing-subscriber = { version = "0.3", features = ["env-filter", "local-time"] } # occur `<unknown time>`
 tracing-appender = "0.2"
-lazy_static = "1.4.0"
 async-trait = "0.1"
 
 [build-dependencies]

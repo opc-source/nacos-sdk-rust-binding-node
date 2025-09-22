@@ -41,11 +41,11 @@ function sleep(time){
   const serviceName = 'TestServiceName';
   const group = 'LOVE';
 
-  nacos_naming_client.subscribe(serviceName, group, null, (err, instance_array) => { console.log('subscribe instance_array => ' + JSON.stringify(instance_array)) });
+  await nacos_naming_client.subscribe(serviceName, group, null, (err, instance_array) => { console.log('subscribe instance_array => ' + JSON.stringify(instance_array)) });
   await sleep(2000);
 
   console.log('--------- registerInstance instance1 ------------');
-  nacos_naming_client.registerInstance(serviceName, group, instance1); // If it fails, pay attention to err
+  await nacos_naming_client.registerInstance(serviceName, group, instance1); // If it fails, pay attention to err
   await sleep(1000);
 
   console.log('--------- get all instances 1 ------------');
@@ -55,7 +55,7 @@ function sleep(time){
   await sleep(1000);
 
   console.log('--------- batchRegisterInstance instance2 ------------');
-  nacos_naming_client.batchRegisterInstance(serviceName, group, [instance1, instance2]); // If it fails, pay attention to err
+  await nacos_naming_client.batchRegisterInstance(serviceName, group, [instance1, instance2]); // If it fails, pay attention to err
   await sleep(1000);
 
   console.log('--------- get all instances 2 ------------');

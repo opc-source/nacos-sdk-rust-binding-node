@@ -6,7 +6,7 @@ use std::sync::Arc;
 /// Client api of Nacos Config.
 #[napi]
 pub struct NacosConfigClient {
-  inner: Arc<dyn nacos_sdk::api::config::ConfigService + Send + Sync + 'static>,
+  inner: nacos_sdk::api::config::ConfigService,
 }
 
 #[napi]
@@ -75,7 +75,7 @@ impl NacosConfigClient {
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(NacosConfigClient {
-      inner: Arc::new(config_service),
+      inner: config_service,
     })
   }
 

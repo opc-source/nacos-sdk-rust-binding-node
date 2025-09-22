@@ -6,7 +6,7 @@ use std::sync::Arc;
 /// Client api of Nacos Naming.
 #[napi]
 pub struct NacosNamingClient {
-  inner: Arc<dyn nacos_sdk::api::naming::NamingService + Send + Sync + 'static>,
+  inner: nacos_sdk::api::naming::NamingService,
 }
 
 #[napi]
@@ -61,7 +61,7 @@ impl NacosNamingClient {
       .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
 
     Ok(NacosNamingClient {
-      inner: Arc::new(naming_service),
+      inner: naming_service,
     })
   }
 
