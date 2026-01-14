@@ -1,6 +1,6 @@
 [package]
 name = "nacos-sdk-rust-binding-node"
-version = "0.5.2"
+version = "0.5.3"
 edition = "2024"
 license = "Apache-2.0"
 publish = false
@@ -19,7 +19,7 @@ crate-type = ["cdylib"]
 napi = { version = "2", default-features = false, features = ["napi4", "async"] }
 napi-derive = "2"
 
-nacos-sdk = { version = "0.5.2", features = ["default", "auth-by-aliyun"] }
+nacos-sdk = { version = "0.5.3", features = ["default", "auth-by-aliyun"] }
 #nacos-sdk = { git = "https://github.com/nacos-group/nacos-sdk-rust.git", branch = "main", features = ["default"] }
 
 tracing-subscriber = { version = "0.3", features = ["default"] }
