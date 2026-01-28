@@ -3,6 +3,8 @@ env:
   DEBUG: napi:*
   APP_NAME: nacos-sdk-rust-binding-node
   MACOSX_DEPLOYMENT_TARGET: '10.13'
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+  CARGO_BUILD_JOBS: 1
 'on':
   push:
     branches:
@@ -41,12 +43,13 @@ jobs:
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
             build: |-
               set -e &&
+              rustup update stable && cargo update &&
               RUST_BACKTRACE=full yarn build --target x86_64-unknown-linux-gnu &&
               strip *.node
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-            build: set -e && yarn build && strip *.node
+            build: set -e && rustup update stable && cargo update && yarn build && strip *.node
           - host: macos-latest
             target: aarch64-apple-darwin
             build: |
@@ -57,6 +60,7 @@ jobs:
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
             build: |-
               set -e &&
+              rustup update stable && cargo update &&
               RUST_BACKTRACE=1 yarn build --target aarch64-unknown-linux-gnu &&
               aarch64-unknown-linux-gnu-strip *.node
           - host: ubuntu-latest
@@ -82,6 +86,7 @@ jobs:
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
             build: |-
               set -e &&
+              rustup update stable && cargo update &&
               rustup target add aarch64-unknown-linux-musl &&
               yarn build --target aarch64-unknown-linux-musl &&
               /aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip *.node
@@ -105,6 +110,12 @@ jobs:
         with:
           toolchain: stable
           targets: ${{ matrix.settings.target }}
+      - name: Update Rust
+        if: ${{ !matrix.settings.docker }}
+        run: rustup update stable
+      - name: Update Cargo dependencies
+        if: ${{ !matrix.settings.docker }}
+        run: cargo update
       - name: Cache cargo
         uses: actions/cache@v3
         with:
@@ -230,7 +241,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
           path: .
@@ -262,7 +273,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bindings-x86_64-unknown-linux-gnu
           path: .
@@ -296,7 +307,7 @@ jobs:
           yarn config set supportedArchitectures.libc "musl"
           yarn install
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bindings-x86_64-unknown-linux-musl
           path: .
@@ -320,7 +331,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bindings-aarch64-unknown-linux-gnu
           path: .
@@ -354,7 +365,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bindings-aarch64-unknown-linux-musl
           path: .
@@ -394,7 +405,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bindings-armv7-unknown-linux-gnueabihf
           path: .
@@ -435,12 +446,12 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Download macOS x64 artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bindings-x86_64-apple-darwin
           path: artifacts
       - name: Download macOS arm64 artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bindings-aarch64-apple-darwin
           path: artifacts
@@ -475,7 +486,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
       - name: Move artifacts
