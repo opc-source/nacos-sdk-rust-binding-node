@@ -1,6 +1,6 @@
 {
   "name": "nacos-sdk-rust-binding-node-freebsd-x64",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "os": [
     "freebsd"
   ],
