@@ -198,3 +198,5 @@ Cargo.lock
 !.yarn/versions
 
 *.node
+
+/.claude/*.local.*

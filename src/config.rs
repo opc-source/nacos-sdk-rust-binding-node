@@ -29,7 +29,8 @@ impl NacosConfigClient {
         client_options
           .app_name
           .unwrap_or(nacos_sdk::api::constants::UNKNOWN.to_string()),
-      );
+      )
+      .config_load_cache_at_start(client_options.config_load_cache_at_start.unwrap_or(false));
 
     // need enable_auth_plugin_http with username & password
     let is_enable_auth_http =
@@ -67,9 +68,12 @@ impl NacosConfigClient {
       config_service_builder
     };
 
-    let config_service = config_service_builder
-      .build()
-      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+    let config_service = crate::get_runtime().block_on(async {
+      config_service_builder
+        .build()
+        .await
+        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
+    })?;
 
     Ok(NacosConfigClient {
       inner: config_service,

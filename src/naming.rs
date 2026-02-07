@@ -53,9 +53,12 @@ impl NacosNamingClient {
       nacos_sdk::api::naming::NamingServiceBuilder::new(props)
     };
 
-    let naming_service = naming_service_builder
-      .build()
-      .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))?;
+    let naming_service = crate::get_runtime().block_on(async {
+      naming_service_builder
+        .build()
+        .await
+        .map_err(|nacos_err| Error::from_reason(nacos_err.to_string()))
+    })?;
 
     Ok(NacosNamingClient {
       inner: naming_service,

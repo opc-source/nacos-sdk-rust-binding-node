@@ -8,6 +8,18 @@ pub fn sum(a: i32, b: i32) -> i32 {
   a + b
 }
 
+/// Global Tokio runtime for async operations in constructors
+static RT: std::sync::OnceLock<tokio::runtime::Runtime> = std::sync::OnceLock::new();
+
+pub fn get_runtime() -> &'static tokio::runtime::Runtime {
+  RT.get_or_init(|| {
+    tokio::runtime::Builder::new_current_thread()
+      .enable_all()
+      .build()
+      .expect("Failed to create Tokio runtime")
+  })
+}
+
 #[napi(object)]
 pub struct ClientOptions {
   /// Server Addr, e.g. address:port[,address:port],...]
@@ -30,6 +42,8 @@ pub struct ClientOptions {
   pub naming_push_empty_protection: Option<bool>,
   /// naming load_cache_at_start, default false
   pub naming_load_cache_at_start: Option<bool>,
+  /// config load_cache_at_start, default false
+  pub config_load_cache_at_start: Option<bool>,
 }
 
 mod config;
