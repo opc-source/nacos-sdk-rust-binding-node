@@ -27,17 +27,29 @@ const nacos_config_client = new NacosConfigClient(
 }
 );
 
-try {
-    // If it fails, pay attention to err
-    nacos_config_client.getConfig('todo-dataid', 'LOVE').then(data => {
+// getConfig - config may not exist, handle error gracefully
+nacos_config_client.getConfig('todo-dataid', 'LOVE')
+    .then(data => {
         console.log('getConfig => ' + data);
+    })
+    .catch(err => {
+        console.log('getConfig error (config may not exist): ' + err.message);
     });
-   
-    nacos_config_client.getConfigResp('todo-dataid', 'LOVE').then((data) => {
-        console.log('getConfigResp => ' + JSON.stringify(data));
-    });
-} catch(e) {
-    console.log(e);
-}
 
-nacos_config_client.addListener('todo-dataid', 'LOVE', (err, config_resp) => { console.log(config_resp) });
+// getConfigResp - config may not exist, handle error gracefully
+nacos_config_client.getConfigResp('todo-dataid', 'LOVE')
+    .then(data => {
+        console.log('getConfigResp => ' + JSON.stringify(data));
+    })
+    .catch(err => {
+        console.log('getConfigResp error (config may not exist): ' + err.message);
+    });
+
+// addListener - listener will be called when config is created/changed
+nacos_config_client.addListener('todo-dataid', 'LOVE', (err, config_resp) => {
+    if (err) {
+        console.log('addListener error: ' + err.message);
+    } else {
+        console.log('config changed => ' + JSON.stringify(config_resp));
+    }
+});
