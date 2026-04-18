@@ -22,8 +22,14 @@ pub fn get_runtime() -> tokio::runtime::Runtime {
 
 #[napi(object)]
 pub struct ClientOptions {
-  /// Server Addr, e.g. address:port[,address:port],...]
+  /// Server Addr, e.g. address:port[,address:port],...
+  /// Note: endpoint takes priority over server_addr when both are provided.
   pub server_addr: String,
+  /// Endpoint is used to resolve server addresses dynamically.
+  /// - Full URL (e.g. http://addr:8080/nacos/serverlist): used as-is, appends namespace if missing in query string.
+  /// - Bare hostname (e.g. addr or addr:9090): uses default path /nacos/serverlist and default port 8080.
+  /// Note: endpoint takes priority over server_addr when both are provided.
+  pub endpoint: Option<String>,
   /// Namespace/Tenant
   pub namespace: String,
   /// AppName

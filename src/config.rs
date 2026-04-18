@@ -22,7 +22,7 @@ impl NacosConfigClient {
       )>,
     >,
   ) -> Result<NacosConfigClient> {
-    let props = nacos_sdk::api::props::ClientProps::new()
+    let mut props = nacos_sdk::api::props::ClientProps::new()
       .server_addr(client_options.server_addr)
       .namespace(client_options.namespace)
       .app_name(
@@ -31,6 +31,11 @@ impl NacosConfigClient {
           .unwrap_or(nacos_sdk::api::constants::UNKNOWN.to_string()),
       )
       .config_load_cache_at_start(client_options.config_load_cache_at_start.unwrap_or(false));
+
+    // endpoint takes priority over server_addr when both are provided
+    if let Some(endpoint) = client_options.endpoint {
+      props = props.endpoint(endpoint);
+    }
 
     // need enable_auth_plugin_http with username & password
     let is_enable_auth_http =
